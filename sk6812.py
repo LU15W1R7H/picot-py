@@ -41,9 +41,9 @@ def set(i, r, g, b, w):
     d |= w
     ar[i] = d
 
-def show():
+def show(ms):
     sm.put(ar, 0)
-    time.sleep_us(80)
+    time.sleep_ms(ms)
 
 def hsv2rgb(h, s, v):
         if s == 0.0: v*=255; return (v, v, v)
@@ -57,103 +57,94 @@ def hsv2rgb(h, s, v):
         if i == 5: return (v, p, q)
 
 while True:
-    for i in range(0, 60):
-        set(i, 255, 255, 255, 255)
-    show()
-    time.sleep_ms(40)
+
+    for i in range(NUM_LEDS):
+        r = 255
+        g = 0
+        b = 0
+        w = 0 
+
+        set(i, r, g, b, w)
+        show(40)
+
+    for i in range(NUM_LEDS):
+        r = 0
+        g = 255
+        b = 0
+        w = 0 
+
+        set(i, r, g, b, w)
+        show(40)
+
+    for i in range(NUM_LEDS):
+        r = 0
+        g = 0
+        b = 255
+        w = 0 
+
+        set(i, r, g, b, w)
+        show(40)
+
+    for i in range(NUM_LEDS):
+        r = 0
+        g = 0
+        b = 0
+        w = 255 
+
+        set(i, r, g, b, w)
+        show(40)
+
+    for i in range(NUM_LEDS):
+        r = 255
+        g = 255
+        b = 255
+        w = 255 
+
+        set(i, r, g, b, w)
+        show(40)
+        
     for i in range(0, 60):
         set(i, 0, 0, 0, 0)
-    show()
-    time.sleep_ms(40)
+    show(40)
 
-for i in range(0, 60):
-    set(i, 255, 0, 0, 0)
-    show()
+    for l in range(NUM_LEDS):
+        hue = l / NUM_LEDS
+        r, g, b = hsv2rgb(hue, 1, 1)
+        set(l, r, g, b, 0)
+        if l != 0:
+            set(l - 1, 0, 0, 0, 0)
+        show(40)
 
+    for pos in range(0, NUM_LEDS):
+        for l in range(0, NUM_LEDS):
+            dist1 = abs(pos - l)
+            dist2 = NUM_LEDS - dist1
+            dist = min(dist1, dist2)
+            dist = dist / NUM_LEDS
+            prox = pow(1. - dist, 50) 
+            hue = l / NUM_LEDS
+            r, g, b = hsv2rgb(hue, 1., prox)
+            r, g, b = int(r), int(g), int(b)
+            set(l, r, g, b, 0)
+        show(0)
 
-s = 0
-#while True:
-s = (s + 100) % 360
-for l in range(NUM_LEDS):
-   hue = (l / NUM_LEDS * 360 + s) % 360
-   r, g, b = hsv2rgb(hue / 360., 1, 1)
-   set(l, r, g, b, 0)
-   show()
+    for l in range(NUM_LEDS):
+        hue = l / NUM_LEDS
+        r, g, b = hsv2rgb(hue, 1, 1)
+        set(l, r, g, b, 0)
+        show(40)
+        
+        
+    for s in range(0, 360):
+        for l in range(NUM_LEDS):
+            hue = (l / NUM_LEDS * 360 + s) % 360
+            r, g, b = hsv2rgb(hue / 360., 1, 1)
+            set(l, r, g, b, 0)
+        show(0)
+    
+    for l in range(NUM_LEDS):
+        set(l, 0, 0, 0, 0)
+        show(40)
 
-# blue white red
-for i in range(40, 60):
-    set(i, 0, 0, 255, 0)
-
-for i in range(20, 40):
-    set(i, 0, 0, 0, 255)
-
-for i in range(0, 20):
-    set(i, 255, 0, 0, 0)
-
-show()
-time.sleep_ms(2000)
-
-for i in range(NUM_LEDS):
-    r = 255
-    g = 0
-    b = 0
-    w = 0 
-
-    set(i, r, g, b, w)
-    show()
-
-for i in range(NUM_LEDS):
-    r = 0
-    g = 255
-    b = 0
-    w = 0 
-
-    set(i, r, g, b, w)
-    show()
-
-for i in range(NUM_LEDS):
-    r = 0
-    g = 0
-    b = 255
-    w = 0 
-
-    set(i, r, g, b, w)
-    show()
-
-for i in range(NUM_LEDS):
-    r = 0
-    g = 0
-    b = 0
-    w = 255 
-
-    set(i, r, g, b, w)
-    show()
-
-for i in range(NUM_LEDS):
-    r = 255
-    g = 255
-    b = 255
-    w = 255 
-
-    set(i, r, g, b, w)
-    show()
-
-
-# Cycle colours.
-for i in range(NUM_LEDS):
-    for j in range(NUM_LEDS):
-        r = j * 100 // (NUM_LEDS - 1)
-        b = 100 - j * 100 // (NUM_LEDS - 1)
-        if j != i % NUM_LEDS:
-            r >>= 3
-            b >>= 3
-        ar[j] = r << 16 | b
-    sm.put(ar, 0)
-    time.sleep_ms(50)
-
-# Fade out.
-for i in range(24):
-    for j in range(NUM_LEDS):
-        ar[j] >>= 1
-    sm.put(ar, 0)
-    time.sleep_ms(50)
+    time.sleep_ms(1000)
+    
